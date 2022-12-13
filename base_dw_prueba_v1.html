@@ -211,6 +211,9 @@
             border-top: 0px;
             border-bottom: 2px solid #F8B05C;
         }
+        .tab-text {
+            pointer-events: none;
+        }
 
         /**** Otros (enlaces, párrafos) ****/
         .container a.link {
@@ -350,7 +353,7 @@
         <nav class="bl-tabs">
             <ul class="tabs">
                 <li class="tab active" data-target="container-chart">Gráfico</li>
-                <li class="tab" data-target="container-data"><span id="dataText">Notas y datos</span>&nbsp;<i class="fa fa--share fa-download"></i></li>
+                <li class="tab" data-target="container-data"><span class="tab-text" id="dataText">Notas y datos</span>&nbsp;<i class="fa fa--share fa-download"></i></li>
                 <li class="tab" data-target="container-iframe">Embeber</li>
                 <li class="tab tab-rrss" data-target="container-rrss"><i class="fa fa--share fa-share-alt"></i></li>
             </ul>
@@ -487,6 +490,8 @@
 
         function displayContainer(elem) {
             let content = elem.getAttribute('data-target');
+
+            console.log(elem, content);
 
             //Poner activo el botón
             for(let i = 0; i < tabs.length; i++) {
