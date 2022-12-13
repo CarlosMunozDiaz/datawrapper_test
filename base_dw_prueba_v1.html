@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Visualización de Envejecimiento en Red (CSIC)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- ESTILOS PARA ELEMENTOS EXTERNOS AL GRÁFICO -->
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 768px;
+        }
+
+        /* CONTENEDORA */
+        .chart-main {
+            width: 100%;
+            height: auto;
+        }
+        .chart-main .container {
+            position: relative;
+            top: 0px;
+            left: 0px;
+            padding: 0px;
+            width: 100%;
+            height: auto;
+            display: none;
+        }
+        .chart-main .container.active {
+            display: block;
+        }
+        .container-data, .container-rrss, .container-iframe {
+            width: 100%;
+            overflow-y: auto;
+        }
+
+        /***** Bloque GRÁFICO *****/
+        .container-chart {
+            max-width: 100%;
+        }
+        /* Bloque título */
+        .container-chart .bl-title {
+            width: 100%;
+            margin-bottom: 16px;
+        }
+        
+        /* Bloque gráfico */
+        .container-chart .bl-chart {
+            margin: 0px;
+            margin-bottom: 8px;
+            padding: 0px;
+        }
+        .bl-chart .chart-img {
+            display: none;
+        }
+        /* Bloque de información */
+        .container-chart .bl-info {
+            width: 100%;
+            margin-bottom: 16px;
+        }
+        .bl-info .bl-info-first {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 0;
+            padding: 0;
+        }
+        .bl-info .bl-info-first .bl-notes {
+            width: calc(100% - 84px);
+        }
+        .bl-info .bl-info-first .bl-copyright {
+            width: 72px;
+        }
+        .bl-info .bl-info-second p {
+            font-style: italic;
+        }
+        /* Bloque de logos */
+        .container-chart .bl-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .container-chart .bl-logos .logo_enr {
+            width: 51.5px;
+            height: 53px;
+            margin-right: 16px;
+        }
+        .container-chart .bl-logos .logo_csic {
+            width: 136px;
+            height: 32px;
+            margin-left: 16px;
+        }
+
+        /***** Bloque DESCARGA *****/
+
+        /***** Bloque EMBEBER *****/
+
+        /***** Bloque RRSS *****/
+        .container-rrss .rrss {
+            width: 50%;
+            margin: 16px auto 0px auto;
+
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .fa {
+            box-sizing: border-box;
+            padding: 12px;
+            font-size: 20px;
+            width: 44px;
+            height: 44px;
+            text-align: center;
+            text-decoration: none;
+            margin: 5px 2px;
+            border-radius: 50%;
+        }
+
+        .fa--share {
+            padding: 0px;
+            font-size: 1.25em;
+            width: 15px;
+            height: 17px;
+
+            cursor: auto;
+            pointer-events: none;
+        }
+
+        .fa-repeat {
+            padding: 2px;
+            width: 20px;
+            height: 20px;
+            margin-right: 4px;
+        }
+  
+        .fa:hover {
+            opacity: 0.7;
+        }
+
+        .fa-facebook {
+            background: #3B5998;
+            color: white;
+        }
+
+        .fa-twitter {
+            background: #55ACEE;
+            color: white;
+        }
+
+        .fa-linkedin {
+            background: #007bb5;
+            color: white;
+        }
+
+        .fa-instagram {
+            background: #125688;
+            color: white;
+        }
+
+        .fa-whatsapp {
+            background-color: green;
+            color: white;
+        }
+
+        /***** Bloque PESTAÑAS *****/
+        .chart-main .bl-tabs {
+            width: 100%;
+            height: 28px;
+            display: block;
+        }
+        .bl-tabs .tabs {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            outline: 0;
+        }
+        .bl-tabs .tabs .tab {
+            width: 100%;
+            box-sizing: border-box;
+            border-top: 1px solid #e1e1e1;
+            border-bottom: 1px solid #e1e1e1;
+            border-right: 1px solid #e1e1e1;
+            font-size: 0.85em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background-color: #fcfcfc;
+            color: #000;
+        }
+        .bl-tabs .tabs .tab:first-child {
+            border-left: 1px solid #e1e1e1;
+        }
+        .bl-tabs .tabs .tab.tab-rrss {
+            width: 36px !important;
+            flex-shrink: 0;
+        }   
+        .bl-tabs .tabs .tab.active {
+            background-color: #fff;
+            color: #000;
+            border-top: 0px;
+            border-bottom: 2px solid #F8B05C;
+        }
+
+        /**** Otros (enlaces, párrafos) ****/
+        .container a.link {
+            margin: 0;
+            padding: 0;
+            border-bottom: 2px solid #F8B05C;
+            color: #000;
+            text-decoration: none;
+        }
+        .container h1 {
+            font-size: 1.05em;
+            font-weight: 700;
+            line-height: 1.2;
+            
+            margin: 0px;
+            padding: 0px;
+        }
+        .container h3 {
+            font-size: 0.95em;
+            font-weight: 700;
+            line-height: 1.2;
+
+            margin: 0px;
+            margin-top: 4px;
+            margin-bottom: 8px;
+            padding: 0px;
+        }
+        .container p {
+            margin: 0;
+            padding: 0;
+            outline: 0;
+
+            font-size: 0.9em;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+        .btn-share {
+            background-color: #fcfcfc;
+            border: 2px solid #F8B05C;
+            padding: 0px 8px;
+            border-radius: 3px;
+
+            cursor: pointer;
+            
+            font-size: 0.85rem;
+        }
+        .text-iframe {
+            width: 98%;
+            height: 120px;
+        }
+        .margin-bottom {
+            margin-bottom: 16px !important;
+        }
+
+        @media screen and (max-width: 600px) {
+            .container-rrss .rrss {
+                width: 80%;
+            }
+        }
+    </style>
+
+    <!-- Contenido HTML -->
+    <section class="chart-main">
+        <section class="container container-chart active" id="chartBlock">
+            <!-- Título y subtítulo -->
+            <div class="bl-title">
+                <h1>Prueba de título largo para comprobar include HTML responsivo con gráfico en Datawrapper</h1>
+                <h3>Prueba de subtítulo para visualización</h3>
+            </div>
+    
+            <!-- Visualización DW -->
+            <div class="bl-chart" id="chartDw">
+                <!-- INICIO - Seleccionar opción 'Responsive iframe' - Incluir un ID -->
+                <iframe title="Nacional - 30 a 40" aria-label="Interactive line chart" id="datawrapper-chart-GvrfJ" src="https://datawrapper.dwcdn.net/GvrfJ/2/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" width="720" height="420" data-external="2"></iframe>
+                <script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(e){if(void 0!==e.data["datawrapper-height"]){var t=document.querySelectorAll("iframe");for(var a in e.data["datawrapper-height"])for(var r=0;r<t.length;r++){if(t[r].contentWindow===e.source)t[r].style.height=e.data["datawrapper-height"][a]+"px"}}}))}();</script>
+                <!-- FINAL -->
+                <img class="chart-img" src="./prueba.png" alt="Imagen de la visualización" width="100%" height="420px">
+            </div>
+    
+            <!-- Notas asociadas al gráfico -->
+            <div class="bl-info">
+                <div class="bl-info-first">
+                    <div class="bl-notes">
+                        <p><b>Fuente:</b> Prueba de fuente en gráfico. Instituto Nacional de Estadística (INE) y Departamento de Población, CSIC</p>
+                        <p><b>Elaboración:</b> Laboratorio de Estadísticas Experimentales (CSIC).</p>
+                    </div>
+                    <p class="bl-copyright">
+                        <a class="link" href="" target="_blank">CC BY 4.0</a>
+                    </p>
+                </div>
+                <div class="bl-info-second">
+                    <p><b>Notas:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin euismod blandit ligula eget tincidunt. Mauris id ipsum massa. Nam eu vehicula diam. Integer quis ex a nisi aliquet mollis auctor quis dui.</p>
+                </div>
+            </div>
+
+            <!-- Logos
+                - Estas imágenes se pueden alojar donde mejor convenga. 
+                En esta prueba cojo dos de un repositorio ya existente en Github)
+            -->
+            <div class="bl-logos">
+                <img class="logo_enr" src="https://raw.githubusercontent.com/EnvejecimientoEnRed/every-data/main/logos/nuevo_logo_enr.jpeg" alt="Logo de Envejecimiento en Red" width="100%" height="100%">
+                <img class="logo_csic" src="https://raw.githubusercontent.com/EnvejecimientoEnRed/every-data/main/logos/logotipo_csic.png" alt="Logo del Consejo Superior de Investigaciones Científicas" width="100%" height="100%">
+            </div>
+        </section>
+        <section class="container container-data">
+            <h1 class="margin-bottom">Repositorio de código, de datos y posibilidad de descarga como imagen estática</h1>
+            <h3>Descarga de datos</h3>
+            <p>Los datos procesados en esta visualización los puede encontrar en <a class="link" href="https://github.com/EnvejecimientoEnRed/informe_perfil_mayores_2022_social_4_12" target="_blank">este repositorio de Github</a>.</p>
+            <p>Si desea descargarlos, puede hacerlo desde <a class="link" href="https://raw.githubusercontent.com/EnvejecimientoEnRed/informe_perfil_mayores_2022_social_4_12/main/data/piramide_estudios_censo_2011.csv" target="_blank">aquí</a>.</p>
+            <h3>Descargar como PNG</h3>
+            <p>También puede descargar el gráfico como una imagen .png haciendo click <button class="btn_share" id="pngImage">aquí</button></p> 
+            <p>El gráfico se descargará con los últimos filtros que haya utilizado.</p>
+            <p>Es conveniente advertir que, tras hacer una modificación de filtros, debe esperar unos segundos (entre 6 y 10) para que se renderice correctamente el bloque y pueda descargar la imagen de forma satisfactoria.</p>
+        </section>
+        <section class="container container-iframe">
+            <h1 class="margin-bottom">Uso del iframe en sitios web</h1>
+            <h3>Embeber iframe con alto dinámico</h3>
+            <p>A la hora de utilizar la visualización dentro de un iframe y poder visualizarla de forma responsiva, este desarrollo se sirve de la librería <a class="link" href="http://blog.apps.npr.org/pym.js/" target="_blank">Pym.js</a>, que modifica de forma dinámica la altura de los iframes.</p>
+            <p>Si su sitio web acepta el uso de librerías de terceros, como es el caso de Pym.js, y desea disponer la opción responsiva de esta visualización, copie el siguiente código:</p>
+            <textarea class="text-iframe margin-bottom" disabled="" id="iframe-responsive"></textarea>
+            <h3>Embeber iframe con alto fijo</h3>
+            <p>Si su sitio web no acepta iframes responsivos, puede utilizar el siguiente código con altura fija. Es posible que exista scroll vertical al incrustar el iframe en su página web.</p>             
+            <p>Si desea integrar esta visualización en su propia página, puede hacerlo copiando el siguiente código:</p>
+            <textarea class="text-iframe" disabled="" id="iframe-fixed"></textarea>
+        </section>
+        <section class="container container-rrss">
+            <h1 class="margin-bottom">Compartir en redes sociales</h1>
+            <p>Existe la posibilidad de compartir la visualización a través de las redes sociales. Puede hacerlo clicando en alguno de los siguientes iconos:</p>
+            <div class="rrss">
+                <a href="#" class="fa fa-facebook" id="shareFB" target="_blank"></a>
+                <a href="#" class="fa fa-twitter" id="shareTW" target="_blank"></a>
+                <a href="#" class="fa fa-linkedin" id="shareLK" target="_blank"></a>
+                <a href="#" class="fa fa-whatsapp" id="shareWA" target="_blank"></a>
+            </div>
+        </section>
+        <!-- PESTAÑAS -->
+        <nav class="bl-tabs">
+            <ul class="tabs">
+                <li class="tab active" data-target="container-chart">Gráfico</li>
+                <li class="tab" data-target="container-data">Descarga&nbsp;<i class="fa fa--share fa-download"></i></li>
+                <li class="tab" data-target="container-iframe">Embeber</li>
+                <li class="tab tab-rrss" data-target="container-rrss"><i class="fa fa--share fa-share-alt"></i></li>
+            </ul>
+        </nav>
+    </section>
+    
+    <!-- SCRIPTS (PYMJS y HTML2CANVAS)-->
+    <script src="https://pym.nprapps.org/pym.v1.min.js"></script>
+    <script>var pymChild=new pym.Child();</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- SCRIPT PROPIO -->
+    <script>
+        // ALTURA //
+        function setChartHeight() {
+            if(document.getElementById('chartBlock').clientHeight != 0) {
+                document.getElementsByClassName('chart-main')[0].style.height = document.getElementById('chartBlock').clientHeight + 'px';
+                document.getElementsByClassName('container-data')[0].style.height = document.getElementById('chartBlock').clientHeight + 'px';
+                document.getElementsByClassName('container-iframe')[0].style.height = document.getElementById('chartBlock').clientHeight + 'px';
+                document.getElementsByClassName('container-rrss')[0].style.height = document.getElementById('chartBlock').clientHeight + 'px';
+                pymChild.sendHeight();
+            }
+        }
+
+        setChartHeight();
+
+        window.addEventListener('resize', function() {
+            setChartHeight();
+        });
+
+        ///// DESCARGA IMAGEN /////
+        let innerCanvas;
+
+        function setChartCanvas() {
+            //Invisibilizamos el iframe
+            document.getElementById('chartDw').getElementsByTagName('iframe')[0].style.display = 'none';
+            //Visibilizamos la imagen Datawrapper 
+            document.getElementById('chartDw').getElementsByClassName('chart-img')[0].style.display = 'block';
+            //Ejecutamos la operación con HTML2CANVAS
+            html2canvas(
+                document.querySelector("#chartBlock"), 
+                {
+                    width: document.querySelector("#chartBlock").clientWidth, 
+                    height: document.querySelector("#chartBlock").clientHeight, 
+                    imageTimeout: 3000, 
+                    useCORS: true
+                }
+            )
+            .then(canvas => { 
+                innerCanvas = canvas;
+                //Visibilizamos el frame
+                document.getElementById('chartDw').getElementsByTagName('iframe')[0].style.display = 'block';
+                //Invisiblizamos la imagen
+                document.getElementById('chartDw').getElementsByClassName('chart-img')[0].style.display = 'none';
+            });
+        }
+
+        function setChartCanvasImage() {    
+            var image = innerCanvas.toDataURL();
+            // Create a link
+            var aDownloadLink = document.createElement('a');
+            // Add the name of the file to the link
+            aDownloadLink.download = 'grafico_enr.png';
+            // Attach the data to the link
+            aDownloadLink.href = image;
+            // Get the code to click the download link
+            aDownloadLink.click();
+        }
+
+        let pngDownload = document.getElementById('pngImage');
+
+        pngDownload.addEventListener('click', function(){
+            setChartCanvasImage();
+        });
+        ///// FINAL DESCARGA IMAGEN /////
+
+
+        ///// IFRAMES /////
+        let githubRepo = 'informe_personas'; //Completar con el nombre del repositorio de Github (p.e.: "informe_personas_mayores_4_11")
+        //Iframe fijo
+        let id1 = document.getElementById('iframe-fixed');
+        id1.innerHTML = '<iframe src="https://EnvejecimientoEnRed/' + githubRepo + '/" style="height:720px;width:100%;" title="Gráfico Envejecimiento en Red"></iframe>';
+    
+        //Iframe responsive
+        let id2 = document.getElementById('iframe-responsive');
+        id2.innerHTML = "<div id='viz_cchs_informe_perfil_mayores_2022'></div><script type='text/javascript' src='https://pym.nprapps.org/pym.v1.min.js'><\/script><script>let pymParent = new pym.Parent('grafico_enr', 'https://EnvejecimientoEnRed.github.io/" + githubRepo + "/', {}<\/script>";
+        ///// FINAL IFRAMES /////
+
+        
+        ///// REDES SOCIALES /////
+        let urlPage = window.location.href;
+        //Facebook
+        let shareFB = document.getElementById("shareFB");
+        let fbHref = "https://www.facebook.com/sharer/sharer.php?u="+urlPage;
+        shareFB.setAttribute("href",fbHref);
+
+        //Twitter
+        let shareTW = document.getElementById("shareTW");
+        let twHref = "https://twitter.com/intent/tweet?url="+urlPage+"&text=grafico_enr&original_referer="+urlPage;
+        shareTW.setAttribute("href",twHref);
+
+        //Linkedin
+        let shareLK = document.getElementById("shareLK");
+        let lkHref = "https://www.linkedin.com/shareArticle?mini=true&url="+urlPage+"&title=grafico_enr&summary=&source=";
+        shareLK.setAttribute("href",lkHref);
+
+        //WhatsApp
+        let shareWA = document.getElementById("shareWA");
+        let waHref = "https://api.whatsapp.com/send?text=grafico_enr"+urlPage;
+        shareWA.setAttribute("href",waHref);
+        ///// FINAL RRSS /////
+
+        
+        ///// SISTEMA DE PESTAÑAS /////
+        let tabs = document.getElementsByClassName('tab');
+        let contenidos = document.getElementsByClassName('container');
+        let tabCount = 0;
+
+        for(let i = 0; i < tabs.length; i++) {
+            tabs[i].addEventListener('click', function(e) {
+                //Obtenemos nueva imagen 
+                if(i != 0 && tabCount != 1) {
+                    tabCount = 1;
+                    setChartCanvas();
+                }
+                //Mostramos nueva pestaña
+                document.getElementsByClassName('chart-main')[0].scrollIntoView();
+                displayContainer(e.target);
+            });
+        }
+
+        function displayContainer(elem) {
+            let content = elem.getAttribute('data-target');
+
+            //Poner activo el botón
+            for(let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            elem.classList.add('active');
+
+            //Activar el contenido
+            for(let i = 0; i < contenidos.length; i++) {
+                contenidos[i].classList.remove('active');
+            }
+
+            document.getElementsByClassName(content)[0].classList.add('active');
+        }
+        ///// FINAL PESTAÑAS /////
+
+    </script>
+</body>
+</html>
